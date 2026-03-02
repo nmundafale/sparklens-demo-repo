@@ -8,9 +8,11 @@ def main():
         
     print("Starting OOM dummy job...")
     
-    # Generate large datasets to trigger OutOfMemory
-    df1 = spark.range(0, 50000000).withColumnRenamed("id", "id1")
-    df2 = spark.range(0, 50000000).withColumnRenamed("id", "id2")
+    # Generate smaller datasets to avoid OutOfMemory for a cross join
+    # Reduced from 50,000,000 to 5,000 rows each.
+    # This makes the cross join result (5,000 * 5,000 = 25,000,000 rows) manageable.
+    df1 = spark.range(0, 5000).withColumnRenamed("id", "id1")
+    df2 = spark.range(0, 5000).withColumnRenamed("id", "id2")
     
     # Force a cross join to maximize memory and shuffle usage, which will blow up Executors
     spark.conf.set("spark.sql.crossJoin.enabled", "true")
